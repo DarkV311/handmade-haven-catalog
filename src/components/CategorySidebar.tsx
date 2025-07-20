@@ -37,8 +37,9 @@ export function CategorySidebar({ selectedCategory, onCategoryChange, categories
 
   return (
     <Sidebar
-      className={`${collapsed ? "w-16" : "w-80"} bg-card border-r border-border transition-all duration-300`}
+      className={`${collapsed ? "w-16" : "w-80"} bg-card border-l border-border transition-all duration-300`}
       collapsible="icon"
+      side="right"
     >
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between">
@@ -63,21 +64,21 @@ export function CategorySidebar({ selectedCategory, onCategoryChange, categories
                         : 'hover:bg-muted text-foreground'
                     }`}
                   >
-                    <button onClick={() => onCategoryChange(category.id)}>
-                      <category.icon size={20} className="ml-3 flex-shrink-0" />
-                      {!collapsed && (
-                        <>
-                          <span className="flex-1 text-right">{category.name}</span>
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            selectedCategory === category.id 
-                              ? 'bg-primary-foreground/20 text-primary-foreground' 
-                              : 'bg-muted text-muted-foreground'
-                          }`}>
-                            {category.count}
-                          </span>
-                        </>
-                      )}
-                    </button>
+                     <button onClick={() => onCategoryChange(category.id)}>
+                       <category.icon size={20} className="mr-3 flex-shrink-0" />
+                       {!collapsed && (
+                         <>
+                           <span className="flex-1 text-right">{category.name}</span>
+                           <span className={`text-xs px-2 py-1 rounded-full ${
+                             selectedCategory === category.id 
+                               ? 'bg-primary-foreground/20 text-primary-foreground' 
+                               : 'bg-muted text-muted-foreground'
+                           }`}>
+                             {category.count}
+                           </span>
+                         </>
+                       )}
+                     </button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

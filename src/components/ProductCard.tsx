@@ -17,6 +17,13 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onWhatsApp }: ProductCardProps) {
+  const handleWhatsApp = () => {
+    const message = `السلام عليكم، أريد الاستفسار عن هذا المنتج:\n\n${product.name}\n${product.description}\nالسعر: ${product.price}`;
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/201004119595?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   return (
     <Card className="group overflow-hidden transition-all duration-300 hover:shadow-warm hover:-translate-y-1 bg-card border border-border">
       <div className="relative overflow-hidden">
@@ -43,7 +50,7 @@ export function ProductCard({ product, onWhatsApp }: ProductCardProps) {
           </span>
           
           <Button 
-            onClick={() => onWhatsApp(product)}
+            onClick={handleWhatsApp}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
           >
             <MessageCircle size={18} />

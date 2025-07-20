@@ -54,7 +54,7 @@ export function Layout({ children, selectedCategory, onCategoryChange }: LayoutP
               <div className="flex items-center gap-4">
                 <div className="text-right">
                   <div className="text-sm text-muted-foreground">للتواصل</div>
-                  <div className="font-semibold text-foreground">01234567890</div>
+                  <div className="font-semibold text-foreground">01004119595</div>
                 </div>
               </div>
             </div>
