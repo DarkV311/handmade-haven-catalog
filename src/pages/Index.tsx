@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Layout } from "@/components/Layout";
 import { HeroBanner } from "@/components/HeroBanner";
-import { ProductGrid } from "@/components/ProductGrid";
-import { products } from "@/data/products";
+import { DynamicProductGrid } from "@/components/DynamicProductGrid";
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -14,10 +13,7 @@ const Index = () => {
     >
       <div className="pb-8">
         <HeroBanner />
-        <ProductGrid 
-          products={products} 
-          selectedCategory={selectedCategory}
-        />
+        <DynamicProductGrid selectedCategory={selectedCategory} />
       </div>
     </Layout>
   );

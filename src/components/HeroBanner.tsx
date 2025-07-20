@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useSettings } from "@/hooks/useSupabaseData";
 import heroBanner from "@/assets/hero-banner.jpg";
 
 const bannerImages = [
@@ -25,6 +26,7 @@ const bannerImages = [
 ];
 
 export function HeroBanner() {
+  const { settingsMap } = useSettings();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
@@ -66,17 +68,18 @@ export function HeroBanner() {
       <div className="absolute inset-0 flex items-center justify-center text-center text-white z-10">
         <div className="max-w-4xl px-6">
           <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-fade-in">
-            {bannerImages[currentSlide].title}
+            {settingsMap.hero_title || bannerImages[currentSlide].title}
           </h1>
           <p className="text-xl md:text-2xl mb-8 opacity-90 animate-fade-in">
-            {bannerImages[currentSlide].subtitle}
+            {settingsMap.hero_subtitle || bannerImages[currentSlide].subtitle}
           </p>
           <Button 
             variant="warm"
             size="lg" 
             className="px-8 py-3 text-lg font-semibold"
+            onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
           >
-            تصفح المنتجات
+            {settingsMap.hero_button_text || 'تصفح المنتجات'}
           </Button>
         </div>
       </div>

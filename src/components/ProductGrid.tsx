@@ -20,9 +20,7 @@ export function ProductGrid({ products, selectedCategory }: ProductGridProps) {
     : products;
 
   const handleWhatsApp = (product: Product) => {
-    const message = `مرحباً، أرغب في الاستفسار عن هذا المنتج:\n\n📦 ${product.name}\n💰 ${product.price}\n\nهل يمكنكم تقديم المزيد من التفاصيل؟`;
-    const whatsappUrl = `https://wa.me/201234567890?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+    // This function is no longer used since we moved WhatsApp logic to ProductCard
   };
 
   return (
