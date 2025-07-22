@@ -151,18 +151,21 @@ export function ProductManagement() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">إدارة المنتجات</h2>
-        <Button onClick={() => setShowForm(true)} className="gap-2">
+        <div>
+          <h2 className="text-2xl font-bold">إدارة المنتجات</h2>
+          <p className="text-muted-foreground">إضافة وتعديل وحذف المنتجات</p>
+        </div>
+        <Button onClick={() => setShowForm(true)} className="gap-2 shadow-sm">
           <Plus className="h-4 w-4" />
           إضافة منتج جديد
         </Button>
       </div>
 
       {showForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5" />
+        <Card className="shadow-lg border-0 bg-gradient-to-br from-background to-muted/20">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-t-lg">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Package className="h-5 w-5 text-primary" />
               {editingProduct ? 'تعديل منتج' : 'إضافة منتج جديد'}
             </CardTitle>
           </CardHeader>

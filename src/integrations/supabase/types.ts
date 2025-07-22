@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          password_hash: string
+          updated_at: string | null
+          username: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          password_hash: string
+          updated_at?: string | null
+          username: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          password_hash?: string
+          updated_at?: string | null
+          username?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string | null

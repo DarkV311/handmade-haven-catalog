@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -51,7 +51,7 @@ export function SiteSettingsManagement() {
   });
 
   // تحديث النموذج عند تحميل الإعدادات
-  useState(() => {
+  useEffect(() => {
     if (settingsMap && Object.keys(settingsMap).length > 0) {
       setFormData({
         site_name: settingsMap.site_name || '',
@@ -71,7 +71,7 @@ export function SiteSettingsManagement() {
         logo_url: settingsMap.logo_url || ''
       });
     }
-  });
+  }, [settingsMap]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,15 +166,18 @@ export function SiteSettingsManagement() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">إعدادات الموقع</h2>
+        <div>
+          <h2 className="text-2xl font-bold">إعدادات الموقع</h2>
+          <p className="text-muted-foreground">تحكم في جميع إعدادات الموقع والمحتوى</p>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* إعدادات الموقع العامة */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Globe className="h-5 w-5" />
+        <Card className="shadow-lg border-0 bg-gradient-to-br from-background to-muted/20">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-t-lg">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Globe className="h-5 w-5 text-primary" />
               إعدادات الموقع العامة
             </CardTitle>
           </CardHeader>
@@ -212,10 +215,10 @@ export function SiteSettingsManagement() {
         </Card>
 
         {/* إعدادات البانر الرئيسي */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
+        <Card className="shadow-lg border-0 bg-gradient-to-br from-background to-muted/20">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-t-lg">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Settings className="h-5 w-5 text-primary" />
               إعدادات البانر الرئيسي
             </CardTitle>
           </CardHeader>
@@ -251,10 +254,10 @@ export function SiteSettingsManagement() {
         </Card>
 
         {/* بيانات التواصل */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Phone className="h-5 w-5" />
+        <Card className="shadow-lg border-0 bg-gradient-to-br from-background to-muted/20">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-t-lg">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Phone className="h-5 w-5 text-primary" />
               بيانات التواصل
             </CardTitle>
           </CardHeader>
@@ -301,10 +304,10 @@ export function SiteSettingsManagement() {
         </Card>
 
         {/* وسائل التواصل الاجتماعي */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5" />
+        <Card className="shadow-lg border-0 bg-gradient-to-br from-background to-muted/20">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-t-lg">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <MessageSquare className="h-5 w-5 text-primary" />
               وسائل التواصل الاجتماعي
             </CardTitle>
           </CardHeader>
@@ -341,10 +344,10 @@ export function SiteSettingsManagement() {
         </Card>
 
         {/* إعدادات الألوان */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Palette className="h-5 w-5" />
+        <Card className="shadow-lg border-0 bg-gradient-to-br from-background to-muted/20">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-t-lg">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Palette className="h-5 w-5 text-primary" />
               إعدادات الألوان
             </CardTitle>
           </CardHeader>
@@ -374,7 +377,7 @@ export function SiteSettingsManagement() {
         </Card>
 
         <div className="flex justify-end">
-          <Button type="submit" className="gap-2">
+          <Button type="submit" className="gap-2 shadow-lg bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
             <Save className="h-4 w-4" />
             حفظ الإعدادات
           </Button>

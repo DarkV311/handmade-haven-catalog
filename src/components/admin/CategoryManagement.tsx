@@ -182,18 +182,21 @@ export function CategoryManagement() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">إدارة الأقسام</h2>
-        <Button onClick={() => setShowForm(true)} className="gap-2">
+        <div>
+          <h2 className="text-2xl font-bold">إدارة الأقسام</h2>
+          <p className="text-muted-foreground">إضافة وتعديل وحذف أقسام المنتجات</p>
+        </div>
+        <Button onClick={() => setShowForm(true)} className="gap-2 shadow-sm">
           <Plus className="h-4 w-4" />
           إضافة قسم جديد
         </Button>
       </div>
 
       {showForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FolderOpen className="h-5 w-5" />
+        <Card className="shadow-lg border-0 bg-gradient-to-br from-background to-muted/20">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-t-lg">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <FolderOpen className="h-5 w-5 text-primary" />
               {editingCategory ? 'تعديل قسم' : 'إضافة قسم جديد'}
             </CardTitle>
           </CardHeader>
