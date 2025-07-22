@@ -20,6 +20,8 @@ export interface Product {
   category_id: string;
   is_active: boolean;
   sort_order: number;
+  has_variants?: boolean;
+  base_quantity?: number;
 }
 
 export interface Setting {
