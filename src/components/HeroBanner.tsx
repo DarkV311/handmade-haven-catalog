@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useSettings } from "@/hooks/useSupabaseData";
+import { useSettings, useHeroImages } from "@/hooks/useSupabaseData";
 import heroBanner from "@/assets/hero-banner.jpg";
 
-const bannerImages = [
+const defaultBannerImages = [
   {
     id: 1,
     src: heroBanner,
@@ -27,7 +27,18 @@ const bannerImages = [
 
 export function HeroBanner() {
   const { settingsMap } = useSettings();
+  const { heroImages } = useHeroImages();
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  // استخدام الصور المخصصة من قاعدة البيانات أو الصور الافتراضية
+  const bannerImages = heroImages.length > 0 
+    ? heroImages.map(img => ({
+        id: img.id,
+        src: img.image_url,
+        title: img.title,
+        subtitle: settingsMap.hero_subtitle || "اكتشف مجموعتنا المميزة"
+      }))
+    : defaultBannerImages;
 
   useEffect(() => {
     const interval = setInterval(() => {

@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useProducts, useCategories } from "@/hooks/useSupabaseData";
 import { useColors, useSizes } from "@/hooks/useAdminData";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Edit, Trash2, Package, Palette, Ruler } from "lucide-react";
+import { Plus, Edit, Trash2, Package, Palette, Ruler, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -26,7 +26,7 @@ interface ProductForm {
 }
 
 export function ProductManagement() {
-  const { products, loading: productsLoading } = useProducts();
+  const { products, loading: productsLoading, refetch } = useProducts();
   const { categories, loading: categoriesLoading } = useCategories();
   const { colors, loading: colorsLoading } = useColors();
   const { sizes, loading: sizesLoading } = useSizes();
@@ -34,6 +34,7 @@ export function ProductManagement() {
   
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState<ProductForm>({
     name: '',
     description: '',
@@ -60,6 +61,36 @@ export function ProductManagement() {
     setShowForm(false);
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage.from('product-images').getPublicUrl(fileName);
+      
+      setFormData({...formData, image_url: data.publicUrl});
+      toast({ title: "تم رفع الصورة بنجاح" });
+    } catch (error) {
+      toast({ 
+        title: "خطأ في رفع الصورة", 
+        description: error instanceof Error ? error.message : "فشل في رفع الصورة",
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -82,7 +113,7 @@ export function ProductManagement() {
       }
       
       resetForm();
-      window.location.reload();
+      refetch();
     } catch (error) {
       toast({ 
         title: "حدث خطأ", 
@@ -118,7 +149,7 @@ export function ProductManagement() {
       
       if (error) throw error;
       toast({ title: "تم حذف المنتج بنجاح" });
-      window.location.reload();
+      refetch();
     } catch (error) {
       toast({ 
         title: "حدث خطأ", 
@@ -209,13 +240,27 @@ export function ProductManagement() {
                   </Select>
                 </div>
                 
-                <div>
-                  <Label htmlFor="image_url">رابط الصورة</Label>
-                  <Input
-                    id="image_url"
-                    value={formData.image_url}
-                    onChange={(e) => setFormData({...formData, image_url: e.target.value})}
-                  />
+                <div className="space-y-2">
+                  <Label>صورة المنتج</Label>
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                        disabled={uploading}
+                      />
+                      <Button type="button" disabled={uploading} variant="outline">
+                        <Upload className="h-4 w-4 mr-2" />
+                        {uploading ? 'جاري الرفع...' : 'رفع صورة'}
+                      </Button>
+                    </div>
+                    <Input
+                      placeholder="أو أدخل رابط الصورة"
+                      value={formData.image_url}
+                      onChange={(e) => setFormData({...formData, image_url: e.target.value})}
+                    />
+                  </div>
                 </div>
                 
                 <div>
@@ -258,7 +303,7 @@ export function ProductManagement() {
               </div>
               
               <div className="flex gap-2">
-                <Button type="submit">
+                <Button type="submit" disabled={uploading}>
                   {editingProduct ? 'تحديث' : 'إضافة'}
                 </Button>
                 <Button type="button" variant="outline" onClick={resetForm}>

@@ -6,7 +6,8 @@ import { DashboardOverview } from "@/components/admin/DashboardOverview";
 import { ProductManagement } from "@/components/admin/ProductManagement";
 import { CategoryManagement } from "@/components/admin/CategoryManagement";
 import { SiteSettingsManagement } from "@/components/admin/SiteSettingsManagement";
-import { BarChart3, Package, FolderOpen, Settings, MessageSquare, LogOut } from "lucide-react";
+import { HeroImageManagement } from "@/components/admin/HeroImageManagement";
+import { BarChart3, Package, FolderOpen, Settings, MessageSquare, LogOut, Image } from "lucide-react";
 import { ProtectedAdminRoute } from "@/components/ProtectedAdminRoute";
 import { useToast } from "@/hooks/use-toast";
 
@@ -42,7 +43,7 @@ function AdminContent() {
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 bg-muted/50 p-1 rounded-xl">
+        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 bg-muted/50 p-1 rounded-xl">
           <TabsTrigger value="dashboard" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
             <BarChart3 className="h-4 w-4" />
             لوحة التحكم
@@ -54,6 +55,10 @@ function AdminContent() {
           <TabsTrigger value="categories" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
             <FolderOpen className="h-4 w-4" />
             الأقسام
+          </TabsTrigger>
+          <TabsTrigger value="hero-images" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <Image className="h-4 w-4" />
+            صور الواجهة
           </TabsTrigger>
           <TabsTrigger value="messages" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
             <MessageSquare className="h-4 w-4" />
@@ -75,6 +80,10 @@ function AdminContent() {
 
         <TabsContent value="categories">
           <CategoryManagement />
+        </TabsContent>
+
+        <TabsContent value="hero-images">
+          <HeroImageManagement />
         </TabsContent>
 
         <TabsContent value="messages">

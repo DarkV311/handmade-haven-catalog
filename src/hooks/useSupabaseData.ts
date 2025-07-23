@@ -36,28 +36,28 @@ export function useCategories() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const { data, error } = await supabase
-          .from('categories')
-          .select('*')
-          .eq('is_active', true)
-          .order('sort_order');
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('sort_order');
 
-        if (error) throw error;
-        setCategories(data || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'حدث خطأ في تحميل الأقسام');
-      } finally {
-        setLoading(false);
-      }
+      if (error) throw error;
+      setCategories(data || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'حدث خطأ في تحميل الأقسام');
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchCategories();
   }, []);
 
-  return { categories, loading, error };
+  return { categories, loading, error, refetch: fetchCategories };
 }
 
 export function useProducts() {
@@ -65,28 +65,28 @@ export function useProducts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const { data, error } = await supabase
-          .from('products')
-          .select('*')
-          .eq('is_active', true)
-          .order('sort_order');
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('sort_order');
 
-        if (error) throw error;
-        setProducts(data || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'حدث خطأ في تحميل المنتجات');
-      } finally {
-        setLoading(false);
-      }
+      if (error) throw error;
+      setProducts(data || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'حدث خطأ في تحميل المنتجات');
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchProducts();
   }, []);
 
-  return { products, loading, error };
+  return { products, loading, error, refetch: fetchProducts };
 }
 
 export function useSettings() {
@@ -125,4 +125,42 @@ export function useSettings() {
   }, []);
 
   return { settings, settingsMap, loading, error };
+}
+
+export interface HeroImage {
+  id: string;
+  title: string;
+  image_url: string;
+  is_active: boolean;
+  sort_order: number;
+}
+
+export function useHeroImages() {
+  const [heroImages, setHeroImages] = useState<HeroImage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchHeroImages = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('hero_images')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+
+      if (error) throw error;
+      setHeroImages(data || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'حدث خطأ في تحميل الصور');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchHeroImages();
+  }, []);
+
+  return { heroImages, loading, error, refetch: fetchHeroImages };
 }

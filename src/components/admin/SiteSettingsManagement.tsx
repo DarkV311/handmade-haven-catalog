@@ -105,7 +105,7 @@ export function SiteSettingsManagement() {
       }
       
       toast({ title: "تم حفظ الإعدادات بنجاح" });
-      window.location.reload();
+      // لا حاجة لإعادة تحميل الصفحة، البيانات ستتحديث تلقائياً
     } catch (error) {
       toast({ 
         title: "حدث خطأ", 
