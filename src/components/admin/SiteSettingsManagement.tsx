@@ -11,8 +11,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface SettingsForm {
+  site_title: string;
   site_name: string;
   site_description: string;
+  copyright_text: string;
   hero_title: string;
   hero_subtitle: string;
   hero_image_url: string;
@@ -23,6 +25,8 @@ interface SettingsForm {
   facebook_url: string;
   instagram_url: string;
   twitter_url: string;
+  whatsapp_url: string;
+  tiktok_url: string;
   primary_color: string;
   secondary_color: string;
   logo_url: string;
@@ -33,8 +37,10 @@ export function SiteSettingsManagement() {
   const { toast } = useToast();
   
   const [formData, setFormData] = useState<SettingsForm>({
+    site_title: '',
     site_name: '',
     site_description: '',
+    copyright_text: '',
     hero_title: '',
     hero_subtitle: '',
     hero_image_url: '',
@@ -45,6 +51,8 @@ export function SiteSettingsManagement() {
     facebook_url: '',
     instagram_url: '',
     twitter_url: '',
+    whatsapp_url: '',
+    tiktok_url: '',
     primary_color: '',
     secondary_color: '',
     logo_url: ''
@@ -54,8 +62,10 @@ export function SiteSettingsManagement() {
   useEffect(() => {
     if (settingsMap && Object.keys(settingsMap).length > 0) {
       setFormData({
+        site_title: settingsMap.site_title || '',
         site_name: settingsMap.site_name || '',
         site_description: settingsMap.site_description || '',
+        copyright_text: settingsMap.copyright_text || '',
         hero_title: settingsMap.hero_title || '',
         hero_subtitle: settingsMap.hero_subtitle || '',
         hero_image_url: settingsMap.hero_image_url || '',
@@ -66,6 +76,8 @@ export function SiteSettingsManagement() {
         facebook_url: settingsMap.facebook_url || '',
         instagram_url: settingsMap.instagram_url || '',
         twitter_url: settingsMap.twitter_url || '',
+        whatsapp_url: settingsMap.whatsapp_url || '',
+        tiktok_url: settingsMap.tiktok_url || '',
         primary_color: settingsMap.primary_color || '',
         secondary_color: settingsMap.secondary_color || '',
         logo_url: settingsMap.logo_url || ''
@@ -117,8 +129,10 @@ export function SiteSettingsManagement() {
 
   const getSettingDescription = (key: string): string => {
     const descriptions: Record<string, string> = {
+      site_title: 'عنوان الموقع الرئيسي',
       site_name: 'اسم الموقع',
       site_description: 'وصف الموقع',
+      copyright_text: 'نص حقوق الملكية',
       hero_title: 'عنوان البانر الرئيسي',
       hero_subtitle: 'النص الفرعي للبانر',
       hero_image_url: 'رابط صورة البانر',
@@ -129,6 +143,8 @@ export function SiteSettingsManagement() {
       facebook_url: 'رابط فيسبوك',
       instagram_url: 'رابط إنستجرام',
       twitter_url: 'رابط تويتر',
+      whatsapp_url: 'رابط الواتساب',
+      tiktok_url: 'رابط التيك توك',
       primary_color: 'اللون الأساسي',
       secondary_color: 'اللون الثانوي',
       logo_url: 'رابط الشعار'
@@ -184,6 +200,15 @@ export function SiteSettingsManagement() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
+                <Label htmlFor="site_title">عنوان الموقع الرئيسي</Label>
+                <Input
+                  id="site_title"
+                  value={formData.site_title}
+                  onChange={(e) => setFormData({...formData, site_title: e.target.value})}
+                />
+              </div>
+              
+              <div>
                 <Label htmlFor="site_name">اسم الموقع</Label>
                 <Input
                   id="site_name"
@@ -198,6 +223,15 @@ export function SiteSettingsManagement() {
                   id="logo_url"
                   value={formData.logo_url}
                   onChange={(e) => setFormData({...formData, logo_url: e.target.value})}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="copyright_text">نص حقوق الملكية</Label>
+                <Input
+                  id="copyright_text"
+                  value={formData.copyright_text}
+                  onChange={(e) => setFormData({...formData, copyright_text: e.target.value})}
                 />
               </div>
             </div>
@@ -312,7 +346,7 @@ export function SiteSettingsManagement() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="facebook_url">رابط فيسبوك</Label>
                 <Input
@@ -328,6 +362,24 @@ export function SiteSettingsManagement() {
                   id="instagram_url"
                   value={formData.instagram_url}
                   onChange={(e) => setFormData({...formData, instagram_url: e.target.value})}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="whatsapp_url">رابط الواتساب</Label>
+                <Input
+                  id="whatsapp_url"
+                  value={formData.whatsapp_url}
+                  onChange={(e) => setFormData({...formData, whatsapp_url: e.target.value})}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="tiktok_url">رابط التيك توك</Label>
+                <Input
+                  id="tiktok_url"
+                  value={formData.tiktok_url}
+                  onChange={(e) => setFormData({...formData, tiktok_url: e.target.value})}
                 />
               </div>
               

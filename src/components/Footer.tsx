@@ -1,4 +1,4 @@
-import { Phone, Mail, MapPin, Instagram, Facebook } from "lucide-react";
+import { Phone, Mail, MapPin, Instagram, Facebook, MessageCircle } from "lucide-react";
 import { useSettings } from "@/hooks/useSupabaseData";
 
 export function Footer() {
@@ -16,6 +16,12 @@ export function Footer() {
       icon: Instagram,
       url: settingsMap.instagram_url || "#",
       color: "hover:text-pink-500"
+    },
+    {
+      name: "واتساب",
+      icon: MessageCircle,
+      url: settingsMap.whatsapp_url || "#",
+      color: "hover:text-green-500"
     },
     {
       name: "تيك توك",
@@ -110,7 +116,7 @@ export function Footer() {
         {/* Copyright */}
         <div className="mt-8 pt-8 border-t border-border text-center">
           <p className="text-muted-foreground">
-            © {new Date().getFullYear()} {settingsMap.site_title || 'كتالوج المنتجات اليدوية'} - جميع الحقوق محفوظة
+            {settingsMap.copyright_text || `© ${new Date().getFullYear()} ${settingsMap.site_title || 'كتالوج المنتجات اليدوية'} - جميع الحقوق محفوظة`}
           </p>
         </div>
       </div>
