@@ -115,13 +115,13 @@ export function HeroBanner() {
       </Button>
 
       {/* Dots Indicator */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-20">
         {bannerImages.map((_, index) => (
           <button
             key={index}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+            className={`w-4 h-4 rounded-full transition-all duration-300 hover:scale-110 ${
               index === currentSlide 
-                ? 'bg-white shadow-glow' 
+                ? 'bg-white shadow-glow scale-110 ring-2 ring-white/50' 
                 : 'bg-white/50 hover:bg-white/70'
             }`}
             onClick={() => setCurrentSlide(index)}
