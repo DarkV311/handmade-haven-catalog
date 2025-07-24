@@ -1,6 +1,7 @@
 import { MessageCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Product {
   id: string;
@@ -17,11 +18,29 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onWhatsApp }: ProductCardProps) {
-  const handleWhatsApp = () => {
+  const handleWhatsApp = async () => {
+    // Track product inquiry
+    try {
+      const { error } = await supabase
+        .from('product_inquiries')
+        .insert([{
+          product_id: product.id,
+          visitor_ip: null // Browser can't get IP directly
+        }]);
+      
+      if (error) console.error('Error tracking inquiry:', error);
+    } catch (error) {
+      console.error('Error tracking inquiry:', error);
+    }
+
     const message = `السلام عليكم، أريد الاستفسار عن هذا المنتج:\n\n${product.name}\n${product.description}\nالسعر: ${product.price}`;
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/201004119595?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
+    
+    if (onWhatsApp) {
+      onWhatsApp(product);
+    }
   };
 
   return (

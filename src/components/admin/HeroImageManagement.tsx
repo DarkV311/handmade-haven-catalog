@@ -205,25 +205,24 @@ export function HeroImageManagement() {
               
               <div className="space-y-2">
                 <Label>الصورة</Label>
-                <div className="space-y-2">
-                  <div className="flex gap-2">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileUpload}
-                      disabled={uploading}
-                    />
-                    <Button type="button" disabled={uploading} variant="outline">
-                      <Upload className="h-4 w-4 mr-2" />
-                      {uploading ? 'جاري الرفع...' : 'رفع صورة'}
-                    </Button>
-                  </div>
+                <div className="flex gap-2">
                   <Input
-                    placeholder="أو أدخل رابط الصورة"
-                    value={formData.image_url}
-                    onChange={(e) => setFormData({...formData, image_url: e.target.value})}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    disabled={uploading}
+                    required={!formData.image_url}
                   />
+                  <Button type="button" disabled={uploading} variant="outline">
+                    <Upload className="h-4 w-4 mr-2" />
+                    {uploading ? 'جاري الرفع...' : 'رفع صورة'}
+                  </Button>
                 </div>
+                {formData.image_url && (
+                  <div className="mt-2">
+                    <img src={formData.image_url} alt="معاينة الصورة" className="h-32 w-32 object-cover rounded" />
+                  </div>
+                )}
               </div>
 
               <div>
