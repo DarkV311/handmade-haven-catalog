@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useSettings } from "@/hooks/useSupabaseData";
 import { supabase } from "@/integrations/supabase/client";
-import { Settings, Save, Palette, Phone, MessageSquare, Globe } from "lucide-react";
+import { Settings, Save, Palette, Phone, MessageSquare, Globe, Upload, Image } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -35,6 +35,8 @@ interface SettingsForm {
 export function SiteSettingsManagement() {
   const { settings, settingsMap, loading } = useSettings();
   const { toast } = useToast();
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [heroImageUploading, setHeroImageUploading] = useState(false);
   
   const [formData, setFormData] = useState<SettingsForm>({
     site_title: '',
@@ -84,6 +86,51 @@ export function SiteSettingsManagement() {
       });
     }
   }, [settingsMap]);
+
+  const handleFileUpload = async (file: File, type: 'logo' | 'hero') => {
+    const bucket = type === 'logo' ? 'hero-images' : 'hero-images'; // Using same bucket for both
+    const fileExtension = file.name.split('.').pop();
+    const fileName = `${type}-${Date.now()}.${fileExtension}`;
+
+    if (type === 'logo') {
+      setLogoUploading(true);
+    } else {
+      setHeroImageUploading(true);
+    }
+
+    try {
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .upload(fileName, file);
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(fileName);
+
+      // تحديث البيانات في النموذج
+      if (type === 'logo') {
+        setFormData(prev => ({ ...prev, logo_url: publicUrl }));
+      } else {
+        setFormData(prev => ({ ...prev, hero_image_url: publicUrl }));
+      }
+
+      toast({ title: `تم رفع ${type === 'logo' ? 'الشعار' : 'صورة البانر'} بنجاح` });
+    } catch (error) {
+      toast({
+        title: "خطأ في رفع الصورة",
+        description: error instanceof Error ? error.message : "حدث خطأ غير متوقع",
+        variant: "destructive"
+      });
+    } finally {
+      if (type === 'logo') {
+        setLogoUploading(false);
+      } else {
+        setHeroImageUploading(false);
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -218,12 +265,46 @@ export function SiteSettingsManagement() {
               </div>
               
               <div>
-                <Label htmlFor="logo_url">رابط الشعار</Label>
-                <Input
-                  id="logo_url"
-                  value={formData.logo_url}
-                  onChange={(e) => setFormData({...formData, logo_url: e.target.value})}
-                />
+                <Label htmlFor="logo_upload">شعار الموقع</Label>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => document.getElementById('logo_upload')?.click()}
+                      disabled={logoUploading}
+                      className="gap-2"
+                    >
+                      {logoUploading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                          جاري الرفع...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4" />
+                          اختر صورة الشعار
+                        </>
+                      )}
+                    </Button>
+                    <input
+                      id="logo_upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFileUpload(file, 'logo');
+                      }}
+                    />
+                  </div>
+                  {formData.logo_url && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Image className="h-4 w-4" />
+                      <span>تم رفع الشعار بنجاح</span>
+                    </div>
+                  )}
+                </div>
               </div>
               
               <div>
@@ -277,12 +358,46 @@ export function SiteSettingsManagement() {
             </div>
             
             <div>
-              <Label htmlFor="hero_image_url">رابط صورة البانر</Label>
-              <Input
-                id="hero_image_url"
-                value={formData.hero_image_url}
-                onChange={(e) => setFormData({...formData, hero_image_url: e.target.value})}
-              />
+              <Label htmlFor="hero_image_upload">صورة البانر الرئيسي</Label>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById('hero_image_upload')?.click()}
+                    disabled={heroImageUploading}
+                    className="gap-2"
+                  >
+                    {heroImageUploading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                        جاري الرفع...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4" />
+                        اختر صورة البانر
+                      </>
+                    )}
+                  </Button>
+                  <input
+                    id="hero_image_upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFileUpload(file, 'hero');
+                    }}
+                  />
+                </div>
+                {formData.hero_image_url && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Image className="h-4 w-4" />
+                    <span>تم رفع صورة البانر بنجاح</span>
+                  </div>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
