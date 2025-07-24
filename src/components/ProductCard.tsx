@@ -69,11 +69,11 @@ export function ProductCard({ product, onWhatsApp }: ProductCardProps) {
           </span>
           
           <Button 
-            onClick={handleWhatsApp}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
+            onClick={() => window.location.href = `/product/${product.id}`}
+            variant="outline"
+            className="px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
           >
-            <MessageCircle size={18} />
-            واتساب
+            عرض التفاصيل
           </Button>
         </div>
       </CardContent>
