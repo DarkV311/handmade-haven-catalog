@@ -261,6 +261,39 @@ export type Database = {
         }
         Relationships: []
       }
+      product_images: {
+        Row: {
+          alt_text: string | null
+          created_at: string | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          product_id: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          product_id: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          product_id?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       product_inquiries: {
         Row: {
           created_at: string
@@ -385,6 +418,7 @@ export type Database = {
       }
       products: {
         Row: {
+          additional_details: string | null
           base_quantity: number | null
           category_id: string | null
           created_at: string | null
@@ -400,6 +434,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          additional_details?: string | null
           base_quantity?: number | null
           category_id?: string | null
           created_at?: string | null
@@ -415,6 +450,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          additional_details?: string | null
           base_quantity?: number | null
           category_id?: string | null
           created_at?: string | null

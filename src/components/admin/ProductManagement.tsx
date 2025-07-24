@@ -8,15 +8,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useProducts, useCategories } from "@/hooks/useSupabaseData";
-import { useColors, useSizes } from "@/hooks/useAdminData";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Edit, Trash2, Package, Palette, Ruler, Upload } from "lucide-react";
+import { Plus, Edit, Trash2, Package, Upload, Images, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProductForm {
   name: string;
   description: string;
+  additional_details: string;
   price: number;
   category_id: string;
   image_url: string;
@@ -28,16 +28,16 @@ interface ProductForm {
 export function ProductManagement() {
   const { products, loading: productsLoading, refetch } = useProducts();
   const { categories, loading: categoriesLoading } = useCategories();
-  const { colors, loading: colorsLoading } = useColors();
-  const { sizes, loading: sizesLoading } = useSizes();
   const { toast } = useToast();
   
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [uploading, setUploading] = useState(false);
+  const [additionalImages, setAdditionalImages] = useState<File[]>([]);
   const [formData, setFormData] = useState<ProductForm>({
     name: '',
     description: '',
+    additional_details: '',
     price: 0,
     category_id: '',
     image_url: '',
@@ -50,6 +50,7 @@ export function ProductManagement() {
     setFormData({
       name: '',
       description: '',
+      additional_details: '',
       price: 0,
       category_id: '',
       image_url: '',
@@ -57,6 +58,7 @@ export function ProductManagement() {
       has_variants: false,
       base_quantity: 0
     });
+    setAdditionalImages([]);
     setEditingProduct(null);
     setShowForm(false);
   };
@@ -91,10 +93,21 @@ export function ProductManagement() {
     }
   };
 
+  const handleAdditionalImagesUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    setAdditionalImages(prev => [...prev, ...files]);
+  };
+
+  const removeAdditionalImage = (index: number) => {
+    setAdditionalImages(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
+      let productId = editingProduct?.id;
+      
       if (editingProduct) {
         const { error } = await supabase
           .from('products')
@@ -104,12 +117,42 @@ export function ProductManagement() {
         if (error) throw error;
         toast({ title: "تم تحديث المنتج بنجاح" });
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('products')
-          .insert([formData]);
+          .insert([formData])
+          .select()
+          .single();
         
         if (error) throw error;
+        productId = data.id;
         toast({ title: "تم إضافة المنتج بنجاح" });
+      }
+
+      // Upload additional images
+      if (additionalImages.length > 0 && productId) {
+        for (let i = 0; i < additionalImages.length; i++) {
+          const file = additionalImages[i];
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${productId}_${Date.now()}_${i}.${fileExt}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('product-images')
+            .upload(fileName, file);
+
+          if (uploadError) {
+            console.error('Error uploading image:', uploadError);
+            continue;
+          }
+
+          const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(fileName);
+          
+          await supabase.from('product_images').insert([{
+            product_id: productId,
+            image_url: urlData.publicUrl,
+            alt_text: `${formData.name} - صورة ${i + 1}`,
+            sort_order: i
+          }]);
+        }
       }
       
       resetForm();
@@ -128,6 +171,7 @@ export function ProductManagement() {
     setFormData({
       name: product.name,
       description: product.description || '',
+      additional_details: product.additional_details || '',
       price: product.price,
       category_id: product.category_id || '',
       image_url: product.image_url || '',
@@ -283,6 +327,53 @@ export function ProductManagement() {
                   rows={3}
                 />
               </div>
+
+              {/* Additional Images */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Images className="h-4 w-4" />
+                  صور إضافية للمنتج
+                </Label>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleAdditionalImagesUpload}
+                />
+                {additionalImages.length > 0 && (
+                  <div className="grid grid-cols-4 gap-2">
+                    {additionalImages.map((file, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`صورة ${index + 1}`}
+                          className="w-full h-20 object-cover rounded border"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute -top-2 -right-2 h-6 w-6"
+                          onClick={() => removeAdditionalImage(index)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
+              <div>
+                <Label htmlFor="additional_details">تفاصيل إضافية</Label>
+                <Textarea
+                  id="additional_details"
+                  value={formData.additional_details}
+                  onChange={(e) => setFormData({...formData, additional_details: e.target.value})}
+                  rows={4}
+                  placeholder="تفاصيل إضافية عن المنتج..."
+                />
+              </div>
               
               <div className="flex items-center space-x-2">
                 <Switch
@@ -359,7 +450,7 @@ export function ProductManagement() {
                 <div className="flex gap-2">
                   {product.has_variants && (
                     <Badge variant="outline" className="gap-1">
-                      <Palette className="h-3 w-3" />
+                      <Package className="h-3 w-3" />
                       متغيرات
                     </Badge>
                   )}

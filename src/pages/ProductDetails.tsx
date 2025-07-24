@@ -1,19 +1,32 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, MessageCircle, Package, Palette, Ruler } from "lucide-react";
+import { ArrowRight, MessageCircle, Package, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useProducts, useCategories } from "@/hooks/useSupabaseData";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  price_currency: string;
+  image_url: string;
+  category_id: string;
+  description: string;
+  additional_details?: string;
+}
 
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { products, loading } = useProducts();
   const { categories } = useCategories();
+  const [productImages, setProductImages] = useState<any[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const product = products.find(p => p.id === id);
+  const product = products.find(p => p.id === id) as Product | undefined;
   const category = categories.find(c => c.id === product?.category_id);
 
   useEffect(() => {
@@ -27,6 +40,21 @@ export default function ProductDetails() {
         }])
         .then(({ error }) => {
           if (error) console.error('Error tracking view:', error);
+        });
+
+      // Fetch product images
+      supabase
+        .from('product_images')
+        .select('*')
+        .eq('product_id', id)
+        .eq('is_active', true)
+        .order('sort_order')
+        .then(({ data, error }) => {
+          if (error) {
+            console.error('Error fetching images:', error);
+          } else {
+            setProductImages(data || []);
+          }
         });
     }
   }, [id]);
@@ -52,6 +80,19 @@ export default function ProductDetails() {
       </div>
     );
   }
+
+  const allImages = [
+    ...(product.image_url ? [{ image_url: product.image_url, alt_text: product.name }] : []),
+    ...productImages
+  ];
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
 
   const handleWhatsApp = async () => {
     // Track product inquiry
@@ -101,27 +142,66 @@ export default function ProductDetails() {
 
       <div className="container mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Product Image */}
+          {/* Product Images */}
           <div className="space-y-4">
-            <div className="relative overflow-hidden rounded-lg border border-border">
-              <img 
-                src={product.image_url} 
-                alt={product.name}
-                className="w-full h-96 lg:h-[500px] object-cover"
-              />
-            </div>
-            
-            {/* Additional Images Placeholder */}
-            <div className="grid grid-cols-4 gap-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div 
-                  key={i} 
-                  className="aspect-square rounded border border-border bg-muted flex items-center justify-center"
-                >
-                  <Package className="text-muted-foreground" size={24} />
+            {allImages.length > 0 ? (
+              <>
+                <div className="relative overflow-hidden rounded-lg border border-border">
+                  <img 
+                    src={allImages[currentImageIndex]?.image_url} 
+                    alt={allImages[currentImageIndex]?.alt_text || product.name}
+                    className="w-full h-96 lg:h-[500px] object-cover"
+                  />
+                  {allImages.length > 1 && (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white"
+                        onClick={prevImage}
+                      >
+                        <ChevronLeft size={20} />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white"
+                        onClick={nextImage}
+                      >
+                        <ChevronRight size={20} />
+                      </Button>
+                    </>
+                  )}
                 </div>
-              ))}
-            </div>
+                
+                {/* Image Thumbnails */}
+                {allImages.length > 1 && (
+                  <div className="grid grid-cols-4 gap-2">
+                    {allImages.map((img, index) => (
+                      <div 
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`aspect-square rounded border cursor-pointer transition-all ${
+                          currentImageIndex === index 
+                            ? 'border-primary ring-2 ring-primary' 
+                            : 'border-border hover:border-primary/50'
+                        }`}
+                      >
+                        <img 
+                          src={img.image_url} 
+                          alt={img.alt_text || product.name}
+                          className="w-full h-full object-cover rounded"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="relative overflow-hidden rounded-lg border border-border bg-muted flex items-center justify-center h-96 lg:h-[500px]">
+                <Package className="text-muted-foreground" size={64} />
+              </div>
+            )}
           </div>
 
           {/* Product Info */}
@@ -147,53 +227,16 @@ export default function ProductDetails() {
               </p>
             </div>
 
-            {/* Colors */}
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Palette size={20} className="text-primary" />
-                  <h3 className="font-semibold text-foreground">الألوان المتاحة</h3>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <div className="flex items-center gap-2 p-2 rounded border border-border hover:bg-accent cursor-pointer transition-colors">
-                    <div className="w-4 h-4 rounded-full border border-border bg-red-500" />
-                    <span className="text-sm text-foreground">أحمر</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 rounded border border-border hover:bg-accent cursor-pointer transition-colors">
-                    <div className="w-4 h-4 rounded-full border border-border bg-blue-500" />
-                    <span className="text-sm text-foreground">أزرق</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 rounded border border-border hover:bg-accent cursor-pointer transition-colors">
-                    <div className="w-4 h-4 rounded-full border border-border bg-green-500" />
-                    <span className="text-sm text-foreground">أخضر</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Sizes */}
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Ruler size={20} className="text-primary" />
-                  <h3 className="font-semibold text-foreground">المقاسات المتاحة</h3>
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  <div className="p-3 text-center rounded border border-border hover:bg-accent cursor-pointer transition-colors">
-                    <span className="font-medium text-foreground">S</span>
-                  </div>
-                  <div className="p-3 text-center rounded border border-border hover:bg-accent cursor-pointer transition-colors">
-                    <span className="font-medium text-foreground">M</span>
-                  </div>
-                  <div className="p-3 text-center rounded border border-border hover:bg-accent cursor-pointer transition-colors">
-                    <span className="font-medium text-foreground">L</span>
-                  </div>
-                  <div className="p-3 text-center rounded border border-border hover:bg-accent cursor-pointer transition-colors">
-                    <span className="font-medium text-foreground">XL</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Additional Details */}
+            {product.additional_details && (
+              <div className="prose prose-sm max-w-none">
+                <h3 className="text-lg font-semibold text-foreground mb-2">تفاصيل إضافية</h3>
+                <div 
+                  className="text-muted-foreground leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: product.additional_details.replace(/\n/g, '<br>') }}
+                />
+              </div>
+            )}
 
             {/* WhatsApp Button */}
             <div className="pt-4">
